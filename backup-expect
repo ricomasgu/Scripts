@@ -1,0 +1,19 @@
+#!/usr/bin/expect -f
+set username [lindex $argv 0]
+set ipfirewall [lindex $argv 1]
+set password [lindex $argv 2]
+set filename [lindex $argv 3]
+set iptftpserver [lindex $argv 4]
+set typedevice [lindex $argv 5]
+spawn ssh -o "StrictHostKeyChecking no" $username@$ipfirewall
+expect "password:"
+send "$password\n"
+expect "#"
+if {[regexp -nocase "FORTIGATE" $typedevice]} {
+        send "execute backup config tftp $filename $iptftpserver\n"
+} elseif {[regexp -nocase "FORTIGATE" $typedevice]} {
+        send "execute backup full-config tftp $filename $iptftpserver\n"
+}
+send "execute backup config tftp $filename $iptftpserver\n"
+expect "#"
+send "exit\n"
