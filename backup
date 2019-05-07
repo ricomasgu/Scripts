@@ -1,0 +1,48 @@
+#!/bin/bash
+#Este script necesita 3 parámetros:
+#       USERNAME: Usuario con el que se accede al dispositivo
+#       PASSWORD: Password del usuario
+#       TFTPSERVER: IP del servidor de tftp
+#
+#Si se quieren añadir dispositivos para hacer el backup, se tiene que modificar el fichero clientes.
+#La variable que contiene el path al fichero clientes es CLIENTES
+#
+if [ -z "$1" ] || [ -z "$2" ]
+then
+        echo "Este script necesita estos 2 parámetros:
+        USERNAME: Usuario con el que se accede al dispositivo
+        TFTPSERVER: IP del servidor de tftp
+Además pedirá la password de manera interactiva."
+        exit
+fi
+USERNAME=$1
+TFTPSERVER=$2
+echo -n Password:
+read -s PASSWORD
+DATE=$(date +%d-%b-%Y)
+CLIENTES=clientes-test
+
+for line in $(cat $CLIENTES)
+do
+        TYPEDEVICE=$(echo $line | cut -f1 -d,)
+        HOSTNAME=$(echo $line | cut -f2 -d,)
+        IPDEVICE=$(echo $line | cut -f3 -d,)
+
+        #El script tftp-script necesita las siguientes variables en el orden especificado
+        #username: Usuario con el que se accede al dispositivo
+        #ipfirewall: IP del dispositivo (marca Fortinet) del que queremos la config
+        #password: Password del usuario
+        #filename: Nombre que se le va a dar al fichero que contiene la config. La idea es HOSTNAME-DIA-MES-AÑO
+        #iptftpserver: IP del servidor de tftp
+        #Un ejemplo de ejecución:
+        #./tftp-script rcomas 10.69.254.1 Pa55w.rd fg-config 10.69.254.22
+
+        ./tftp-script $USERNAME $IPDEVICE $PASSWORD $HOSTNAME-$DATE $TFTPSERVER $TYPEDEVICE
+
+        echo "" #Añade un salto de línea estético
+done
+
+#FUTURAS MEJORAS:
+#       Adaptar a otros fabricantes en funcion de que se vaya utilizando
+#       Aplicar medidas de seguridad para que no haya fallas de funcionamiento
+#       Hacer el script más informativo
