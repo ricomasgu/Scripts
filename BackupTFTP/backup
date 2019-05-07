@@ -5,7 +5,7 @@
 #       TFTPSERVER: IP del servidor de tftp
 #
 #Si se quieren añadir dispositivos para hacer el backup, se tiene que modificar el fichero clientes.
-#La variable que contiene el path al fichero data es DATA
+#La variable que contiene el path al fichero clientes es CLIENTES
 #
 if [ -z "$1" ] || [ -z "$2" ]
 then
@@ -20,9 +20,9 @@ TFTPSERVER=$2
 echo -n Password:
 read -s PASSWORD
 DATE=$(date +%d-%b-%Y)
-DATA=data
+CLIENTES=clientes-test
 
-for line in $(cat $CLIENTES | grep -v "^#")
+for line in $(cat $CLIENTES)
 do
         TYPEDEVICE=$(echo $line | cut -f1 -d,)
         HOSTNAME=$(echo $line | cut -f2 -d,)
